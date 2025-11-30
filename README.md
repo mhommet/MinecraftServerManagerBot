@@ -1,6 +1,6 @@
 # Discord Minecraft Manager
 
-Bot Discord permettant de gérer des serveurs Minecraft via Docker Compose, avec des commandes slash modernes.
+Bot Discord permettant de gérer des serveurs Minecraft via Docker Compose.
 
 ***
 
