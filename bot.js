@@ -9,15 +9,14 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const TOKEN = process.env.DISCORD_TOKEN;
 const SERVERS_PATH = '/services/minecraftServers';
 const SERVERS = [
-    { name: 'minecraftrpg', display: 'RPG' },
-    { name: 'minecraftskyblock', display: 'Skyblock' },
-    { name: 'minecrafttwd', display: 'TWD' },
-    { name: 'minecraftvanilla', display: 'Vanilla' }
+    { name: 'minecraftvanilla', display: 'Vanilla', port: 25565 },
+    { name: 'minecrafttwd', display: 'TWD', port: 25567 },
+    { name: 'minecraftskyblock', display: 'Skyblock', port: 25569 }
 ];
 
 client.once('clientReady', async () => {
     console.log(`✅ Bot connecté: ${client.user.tag}`);
-    
+
     const commands = [
         new SlashCommandBuilder()
             .setName('mc')
@@ -49,21 +48,7 @@ client.once('clientReady', async () => {
                     )
             )
             .addSubcommand(subcommand =>
-                subcommand.setName('list').setDescription('Liste des serveurs')
-            )
-            .addSubcommand(subcommand =>
-                subcommand.setName('status').setDescription('Statut d\'un serveur')
-                    .addStringOption(option =>
-                        option.setName('serveur')
-                            .setDescription('Choisir un serveur')
-                            .setRequired(true)
-                            .addChoices(
-                                ...SERVERS.map(srv => ({ name: srv.display, value: srv.name }))
-                            )
-                    )
-            )
-            .addSubcommand(subcommand =>
-                subcommand.setName('auto').setDescription('Lance la vérification auto-arrêt')
+                subcommand.setName('list').setDescription('Liste des serveurs avec statut')
             )
     ].map(command => command.toJSON());
 
@@ -94,23 +79,21 @@ client.on('interactionCreate', async (interaction) => {
             await execAsync(`cd ${SERVERS_PATH}/${server} && docker-compose down`);
             await interaction.editReply(`🔴 **${server}** arrêté !`);
         } else if (subcommand === 'list') {
+            let description = '';
+            for (const srv of SERVERS) {
+                try {
+                    const { stdout } = await execAsync(`cd ${SERVERS_PATH}/${srv.name} && docker-compose ps`);
+                    const running = stdout.includes('Up');
+                    description += `**${srv.display}** (${srv.name}) **:${srv.port}** ${running ? '🟢 En ligne' : '🔴 Arrêté'}\n`;
+                } catch {
+                    description += `**${srv.display}** (${srv.name}) **:${srv.port}** ❓ Inconnu\n`;
+                }
+            }
+            
             const embed = new EmbedBuilder()
                 .setTitle('📋 Serveurs Minecraft')
-                .setDescription(SERVERS.map(srv => `**${srv.display}** (${srv.name})`).join('\n'));
+                .setDescription(description);
             await interaction.editReply({ embeds: [embed] });
-        } else if (subcommand === 'status' && server) {
-            const { stdout } = await execAsync(`cd ${SERVERS_PATH}/${server} && docker-compose ps`);
-            const running = stdout.includes('Up');
-            const embed = new EmbedBuilder()
-                .setTitle(`📊 Statut ${server}`)
-                .addFields(
-                    { name: 'État', value: running ? '🟢 En marche' : '🔴 Arrêté', inline: true },
-                    { name: 'Vérification', value: '`docker-compose ps`', inline: true }
-                );
-            await interaction.editReply({ embeds: [embed] });
-        } else if (subcommand === 'auto') {
-            await execAsync('/usr/local/bin/minecraft-autostop.sh');
-            await interaction.editReply('🟢 Vérification auto-arrêt lancée ! Consulte les logs dans `/var/log/minecraft-autostop.log`');
         }
     } catch (error) {
         await interaction.editReply(`❌ Erreur: ${error.message}`);
