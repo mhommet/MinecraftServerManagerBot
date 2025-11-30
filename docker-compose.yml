@@ -1,0 +1,12 @@
+services:
+  bot:
+    build: .
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/milan/services:/services
+    working_dir: /app
+    restart: unless-stopped
+    env_file:
+      - .env
+
