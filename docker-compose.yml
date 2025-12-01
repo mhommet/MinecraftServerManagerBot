@@ -4,7 +4,7 @@ services:
     volumes:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/milan/services:/services
+      - /home/milan/services/minecraftServers:/services/minecraftServers  # Monte seulement minecraftServers
     working_dir: /app
     restart: unless-stopped
     env_file:

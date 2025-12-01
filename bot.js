@@ -11,10 +11,11 @@ const SERVERS_PATH = '/services/minecraftServers';
 const SERVERS = [
     { name: 'minecraftvanilla', display: 'Vanilla', port: 25565 },
     { name: 'minecrafttwd', display: 'TWD', port: 25567 },
-    { name: 'minecraftskyblock', display: 'Skyblock', port: 25569 }
+    { name: 'minecraftskyblock', display: 'Skyblock', port: 25569 },
+    { name: 'minecraftrpg', display: 'RPG', port: 25566 }
 ];
 
-client.once('clientReady', async () => {
+client.once('ready', async () => {
     console.log(`✅ Bot connecté: ${client.user.tag}`);
 
     const commands = [
@@ -90,6 +91,10 @@ client.on('interactionCreate', async (interaction) => {
                 }
             }
             
+            if (description.length > 1900) {
+                description = description.substring(0, 1897) + '...';
+            }
+
             const embed = new EmbedBuilder()
                 .setTitle('📋 Serveurs Minecraft')
                 .setDescription(description);
