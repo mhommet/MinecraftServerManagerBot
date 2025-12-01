@@ -1,6 +1,6 @@
 # Discord Minecraft Manager
 
-Bot Discord permettant de gérer des serveurs Minecraft via Docker Compose, avec des commandes slash modernes.
+Bot Discord permettant de gérer des serveurs Minecraft via Docker Compose.
 
 ***
 
@@ -11,8 +11,6 @@ Bot Discord permettant de gérer des serveurs Minecraft via Docker Compose, avec
 | `/mc start <serveur>`   | Démarrer un serveur Minecraft       |
 | `/mc stop <serveur>`    | Arrêter un serveur Minecraft        |
 | `/mc list`              | Afficher la liste des serveurs      |
-| `/mc status <serveur>`  | Afficher le statut d’un serveur     |
-| `/mc auto`              | Lancer la vérification d’arrêt automatique des serveurs inactifs |
 
 ***
 
